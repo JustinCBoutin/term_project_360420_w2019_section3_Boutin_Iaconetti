@@ -1,0 +1,43 @@
+Matteo Iaconetti & Justin Boutin
+April 22nd 2019
+360-420-DW, section 3
+Sameer Bhatnagar
+Golf Ball Projectile Motion
+Introduction
+The purpose of our term project was to determine the optimum angle to strike a golf ball for maximum range. We decided to analyze the motion of the golf ball as, using the kinematics equations with gravity as a constant acceleration, the hypothesized optimum angle would be 45 degrees. This is not the case under real-life situations as most shots from professional golfers don’t exceed over 15 degrees, but still travel very far. We wanted to determine what causes this dramatic decrease for the optimum angle, by factoring in more real-life situations to the golf ball such as Drag Force and Magnus Effect. By varying the initial angle of the ball, we can compare the final distance and then compare it to the final distance of the ball with an initial angle of 45 degrees. This will demonstrate the effects of a non-constant acceleration on a spinning projectile. We hypothesize that the maximum range will occur at an angle between 10 and 13 degrees due to the indirect impact of angle on drag and Magnus effect. Drag and Magnus depend on the velocity which will differ depending on the angle used; Vx and Vy vary with the angle.
+Model
+      The motion of the golf ball is divided into three parts: the acceleration, the velocity and its position. The golf ball is shot with an initial linear velocity V, an angular velocity ω, and an initial angle θ. This creates two forces on the ball including the force of gravity which is Drag and Magnus. The Drag force always acts opposite to the direction of motion and the Magnus acts perpendicular to the direction of the angular velocity and linear velocity of the ball.
+
+
+
+
+
+
+
+The Drag Force is directly proportional to the velocity of the ball and is given by the equation: 
+Fd =1/2 Cd  A V2     
+Fdx=Fd cos()   
+Fdy=Fd sin()                                    
+Where Cd is equal to the drag coefficient of a sphere which will be approximated at 0.5 at a Reynolds Number lower than Re=3x105. The drag coefficient is proportional to the Reynolds Number, which is dependent on the velocity of the object through a fluid, in this case, the fluid is air. A significant change in the drag coefficient (Cd) occurs at Re>3x105, but by ignoring the effects of the dimples on the golf ball, the speed required to obtain a Reynolds Number (Re) that high is unattainable for a golf ball. This assumption keeps Cd constant. Another assumption made will be that ⍴, the density of the fluid (air), will remain constant as well, assuming a constant pressure and temperature and will be approximated as 1.168 kg/m3. The cross-sectional area of the Golf Ball will be calculated based on the average diameter of the golf ball which is equal to 42.7mm (0.0427m), therefore the area will be estimated at 0.00143m2. 
+The Magnus effect of the ball is equal to the cross product of the angular velocity and linear velocity of the golf ball and is given by the equation:
+Fm = So (V)
+	Where So is equal to the Magnus coefficient of the ball. However, we will be making an approximation that the angular velocity (⍵)  remains constant during the motion of the ball and its direction is perpendicular to the ‘x’ and ‘y’ plane of the ball. This will assume a nearly perfect shot, ignoring outcomes like hook and slice, in which the ball curves due to a slight  So after doing the cross product, the components of the Magnus force are equal to:
+Fmx=So(-z Vy)
+Fmy=So(z Vx)
+Reminder: the ‘x’ and ‘y’ components of the velocity will depend on the angle.
+The angle of the velocity vector with respect to the horizontal will change depending on the position of the ball during its flight.
+	The resultant forces acting on the golf ball in component form is then represented by:
+Fx=max=-Fdx+Fmx
+Fy=may=-Fdy+Fmy-mg
+After dividing by the mass we get the set of differential equations we will have to solve for which are:
+dVxdt=-Fdxm+Fmxm 
+dVydt=-Fdym+Fmym-g
+Numerical Method
+	To solve these differential equations, we will use two methods of numerical analysis. To determine the velocity of the ball at a given time, Euler’s method will be used. Euler’s method employs a function that changes with time, in our case, the acceleration of the ball which changes throughout its motion. The function is the derivative of the velocity of the ball; to determine the velocity at a given time, the initial conditions of the ball will be added to the value of the function at that time multiplied by a small time increment (dt). The ball will be launched at an angle at 50.0m/s. The angle will change at the start of each iteration. This will give us the initial value of the acceleration of the ball and by applying Euler’s method, we find the velocity after a small time increment using the formulas:
+Vxi+1=Vxi+ax*dt
+Vyi+1=Vyi+ay*dt
+With the components of the velocity after a given time, we apply Pythagorean theorem to determine the magnitude of the velocity vector. Then apply arctan of the y component of the velocity over the x-component of the velocity to determine the new angle with respect to the horizontal.
+After finding the velocity of the first time increment, Euler’s method is applied again to determine the x and y-positions of the ball. By setting the initial positions as (0,0) and finding the positions after a time dt, we can apply Verlet’s method to determine the positions of the ball for the remainder of its motion. Verlet’s is used when solving for a value from a second order derivative, in the case of the golf ball, the acceleration is the second order derivative of the position. It is a more refined version of Euler’s method but requires at least two values to be known which is why Euler’s was applied in advance. Verlet’s uses symmetry by taking one point before and one point after in the calculations to refine our value. While functions of motion do not benefit from the added effect of conserving energy in Verlet’s, it is still a better approach when dealing with second order derivatives. The x and y positions of the ball will then be given by:
+xi+1=2xi-xi-1+xi*dt2
+yi+1=2yi-yi-1+yi*dt2
+The program will then run through a loop to determine the x and y positions until the y position is found to be less than zero. We will take the x-position at the same instance to be our final position, not factoring in bounce or rolling.
