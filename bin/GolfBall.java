@@ -8,109 +8,133 @@ import java.util.Arrays;
 
 public class GolfBall
 {
-	public static final boolean plotxVsy = true; // Only store and plot the angle vs time graph when set to true
+	public static final boolean plotxVsy = false; // Only store and plot the angle vs time graph when set to true
+
+    public static double accx (double v, double theta)
+	{
+		double Cd = 0.5;        // Drag Coefficient for non-dimpled Golf Ball
+	    	double So = 0.217;       // (Magnus coefficient x omega)/mass 
+        	double mass = 0.04593;  // kg
+	   	double area = 0.00143;  // m^2, radius = 21.335mm
+        	double rho = 1.168;     // kg/m^3
+		
+		if (v > 14.0)
+		{
+			Cd = 7.0/v;
+		}
+		
+        	double aDrag = ((Cd * rho * area * (v*v))/mass);        // Formula for the acceleration due to drag Cd*p*area*V^2
+		double aDragx = (aDrag * Math.cos(theta));              // x-component of the acceleration due to drag 
+		
+		/**The Magnus force is given by the cross product of the angular velocity and linear velocity. 
+	       If the angular velocity is purely in the z-direction, the Magnus force only acts in the x and y direction.
+		   And after applying cross product formula the equation for Magnus in x-direction is given by Mx = So(-wz * Vy) 
+		*/
+	
+	    	double aMagnusx = (So * (v * Math.sin(theta))); // x-component of the acceleration due to Magnus (So*Vy)
+	
+	    /** The differntial equation we are solving for tells us that the x-component of the acceleration of the ball 
+		    is equal to the sum of the x components of the acceleration due to Drag and Magnus.
+		*/
+		
+		double accx = (((-1) * (aDragx)) - (aMagnusx)); 
+		return accx;
+	}
+	
+	public static double accy (double v, double theta)
+	{
+		double Cd = 0.5;        
+	    	double So = 0.217;        
+        	double mass = 0.0459;   
+	   	double area = 0.001432;
+        	double rho = 1.168;     
+	    	double g = 9.81;        // accelerartion due to gravity, m/s^2
+		
+		if (v > 14.0)
+		{
+			Cd = 7.0/v;
+		}
+		
+		double aDrag = ((Cd * rho * area * (v*v))/mass);
+		double aDragy = (aDrag * Math.sin(theta)); // y-component of the accelerartion due to drag
+		
+		// After applying cross product formula the equation for Magnus in y-direction is given by My = So(wz * Vx)
+		
+		double aMagnusy = (So * (v * Math.cos(theta))); // y-component of the acceleration due to Magnus (So*Vx)
+	    
+		/** The y-component of the acceleration of the ball is equal to the sum of the y-components of the acceleration 
+		    due to Magnus and Drag, minus the acceleration due to gravity g.
+		*/
+		
+		double accy = (((-1) * (aDragy)) + (aMagnusy) - g);
+		return accy;
+	}
 	
 	public static void main (String[] args)
 	{
-        double Cd = 0.1;     // Drag Coefficient for non-dimpled Golf Ball
-	    double So = 0.25;       // (So*w)/mass
-        double mass = 0.0459;   // kg
-	    double area = 0.001432; // m^2
-        double rho = 1.168;     // kg/m^3
-	    double g = 9.8;         // m/s^2
-	    double dt = 1.0e-3;     // time step, s
-        double tMax = 15.0;     // max time
-	    
-		int imax = (int)(tMax/dt); //index of arrays
-		double[] adrag = new double[imax];
-		double[] amagnusx = new double[imax];
-		double[] amagnusy = new double[imax];
-		double[] v = new double[imax];
-		double[] x = new double[imax];
-		double[] y = new double[imax];
-		double[] theta = new double[imax];
+        	double dt = 1.0e-3;     // time step, s
+        	double tMax = 15.0;     // max time
+	
+	    	int imax = (int)(tMax/dt);                    //index of arrays
+	   	double[] v = new double[imax];                //array for the speed of the golf ball
+	    	double[] x = new double[imax];                //array for the x-position of the golf ball
+	    	double[] y = new double[imax];                //array for the y-position of the golf ball
+	    	double[] theta = new double[imax];            //array for the angle of the ball with respect to the horizontal
+		double[] x45 = new double[imax];              //array for the x-position of the golf ball with initial angle of 45 degrees
+       		double[] y45 = new double[imax];              //array for the y-position of the golf ball with initial angle of 45 degrees
+			
+		v[0] = 70.0;           // initial speed of the ball  
+		theta[0] = 0.00174533; // initial angle of the ball = 0.1 degrees
+		x[0] = 0.0;            // initial x-position of the ball
+		y[0] = 0.0;            // initial y-position of the ball
 		
-		v[0] = 70.0;
-		theta[0] = 0.00174533;
-		x[0] = 0.0;
-		y[0] = 0.0;
+	    	double vx = ((v[0] * Math.cos(theta[0])) + ((accx(v[0],theta[0])) * dt)); // Euler's method to solve for x-component of velocity
+		double vy = ((v[0] * Math.sin(theta[0])) + ((accy(v[0],theta[0])) * dt)); // Euler's method to solve for y-component of velocity
+		v[1] = Math.sqrt((vx * vx) + (vy * vy));                // Pythagorean theorem to find magnitude of velocity
+		theta[1] = Math.atan(vy/vx);                                              // arctan of vy/vx to find the new angle of velocity vector with respect to horizontal
 		
-        adrag[0] = ((Cd * rho * area * (v[0]*v[0]))/mass);
-		double adragx = (adrag[0] * Math.cos(theta[0]));
-		double adragy = (adrag[0] * Math.sin(theta[0]));
-		  
-		amagnusx[0] = (So * (v[0] * Math.sin(theta[0])));
-		amagnusy[0] = (So * (v[0] * Math.cos(theta[0])));
-		  
-		double accx = (((-1) * (adragx)) - (amagnusx[0]));
-		double accy = (((-1) * (adragy)) + (amagnusy[0]) - g);
+		x[1] = (x[0] + (vx * dt)); // Euler to get one value for position in x-direction for Verlet's later
+		y[1] = (y[0] + (vy * dt)); // Euler to get one value for positon in y-direction for Verlet's later
 		
-		double vx = ((v[0] * Math.cos(theta[0])) + (accx * dt));
-		double vy = ((v[0] * Math.sin(theta[0])) + (accy * dt));
-		v[1] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
-		theta[1] = Math.atan(vy/vx);
+		double xf = x[1]; //xf is the current final position of the ball
 		
-		x[1] = (x[0] + (vx * dt));
-		y[1] = (y[0] + (vy * dt));
-		
-		double xf = x[1];
+		/** Now we will start the loop to get the values for the position of the ball during its motion with an initial
+		    angle of 0.1 degrees
+		*/
 		
 		for (int i=2; y[i-1] > 0.0; i++)
 		{
-			if(v[i-1] < 14.0)
-			{
-				Cd = 0.5;
-			}
-			
-			else
-			{
-				Cd = 7.0/v[i-1];
-			}
-			
-			adrag[i-1] = ((Cd * rho * area * (v[i-1]*v[i-1]))/mass);
-			adragx = (adrag[i-1] * Math.cos(theta[i-1]));
-		    adragy = (adrag[i-1] * Math.sin(theta[i-1]));
-			
-			amagnusx[i-1] = (So * (v[i-1] * Math.sin(theta[i-1])));
-		    amagnusy[i-1] = (So * (v[i-1] * Math.cos(theta[i-1])));
-			
-			accx = (((-1) * (adragx)) - (amagnusx[i-1]));
-		    accy = (((-1) * (adragy)) + (amagnusy[i-1]) - g);
-			
-			vx = ((v[i-1] * Math.cos(theta[i-1])) + (accx * dt));
-		    vy = ((v[i-1] * Math.sin(theta[i-1])) + (accy * dt));
+		    vx = ((v[i-1] * Math.cos(theta[i-1])) + ((accx(v[i-1],theta[i-1])) * dt)); //Euler's method still used for components of velocity
+		    vy = ((v[i-1] * Math.sin(theta[i-1])) + ((accy(v[i-1],theta[i-1])) * dt));
 		    v[i] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		    theta[i] = Math.atan(vy/vx);
 		
-		    x[i] = (2*(x[i-1])) - (x[i-2]) + (accx*(dt*dt));
-			y[i] = (2*(y[i-1])) - (y[i-2]) + (accy*(dt*dt));
+		    x[i] = ((x[i-1]) + (vx * dt)); //Verlet's is now used to determine position of ball
+		    y[i] = ((y[i-1]) + (vy * dt));
 			
-			xf = x[i];
+	        xf = x[i+1]; //The value of xf is reassigned until the loop ends and we will take that final value of x[i] as the final position
 		}
 		
-		double xMax = xf;
-		double thetaMax = theta[0];
+		double xMax = xf;           //xMax will be the current max distance of the ball
+		double thetaMax = theta[0]; // thetaMax will be the current optimum angle of the ball
 		
-		for(theta[0] = 0.00349066; theta[0]<Math.PI; theta[0]+=0.00174533)
+		/** Now we start the loop to augment the angle to determine the optimum angle for max distance. The loop will start at 
+		    0.2 degrees and be augmented by 0.1 degrees each time until the value of theta is equal to Pi.
+		*/
+		
+		for(theta[0] = 0.00349066; theta[0] < Math.PI; theta[0]+=0.00174533)
 		{
-		    v[0] = 70.0;
+		    v[0] = 70.0; //The initial velocity will always be 70 m/s
 	        x[0] = 0.0;
 		    y[0] = 0.0;
-		    Cd = 7.0/v[0];
+			
+		    /** The code will now execute the same sequence to find initial values for the x and y components before starting a
+		        loop again to determine the rest of the ball's motion using Euler for the first part and Verlet for the second
+		    */
 		
-            adrag[0] = ((Cd * rho * area * (v[0]*v[0]))/mass);
-		    adragx = (adrag[0] * Math.cos(theta[0]));
-		    adragy = (adrag[0] * Math.sin(theta[0]));
-		  
-		    amagnusx[0] = (So * (v[0] * Math.sin(theta[0])));
-		    amagnusy[0] = (So * (v[0] * Math.cos(theta[0])));
-		  
-		    accx = (((-1) * (adragx)) - (amagnusx[0]));
-		    accy = (((-1) * (adragy)) + (amagnusy[0]) - g);
-		
-		    vx = ((v[0] * Math.cos(theta[0])) + (accx * dt));
-		    vy = ((v[0] * Math.sin(theta[0])) + (accy * dt));
-		    v[1] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
+           	vx = ((v[0] * Math.cos(theta[0])) + ((accx(v[0],theta[0])) * dt));
+		    vy = ((v[0] * Math.sin(theta[0])) + ((accy(v[0],theta[0])) * dt));
+		    v[1] = Math.sqrt((vx*vx) + (vy*vy));
 		    theta[1] = Math.atan(vy/vx);
 		
 		    x[1] = (x[0] + (vx * dt));
@@ -120,37 +144,22 @@ public class GolfBall
 		
 		    for (int i=2; y[i-1] > 0.0; i++)
 		    {
-			    if(v[i-1] < 14.0)
-			    {
-				    Cd = 0.5;
-			    }
-			
-			    else
-			    {
-				    Cd = 7.0/v[i-1];
-			    }
-			
-			    adrag[i-1] = ((Cd * rho * area * (v[i-1]*v[i-1]))/mass);
-			    adragx = (adrag[i-1] * Math.cos(theta[i-1]));
-		        adragy = (adrag[i-1] * Math.sin(theta[i-1]));
-			
-			    amagnusx[i-1] = (So * (v[i-1] * Math.sin(theta[i-1])));
-		        amagnusy[i-1] = (So * (v[i-1] * Math.cos(theta[i-1])));
-			
-			    accx = (((-1) * (adragx)) - (amagnusx[i-1]));
-		        accy = (((-1) * (adragy)) + (amagnusy[i-1]) - g);
-			
-			    vx = ((v[i-1] * Math.cos(theta[i-1])) + (accx * dt));
-		        vy = ((v[i-1] * Math.sin(theta[i-1])) + (accy * dt));
+			    vx = ((v[i-1] * Math.cos(theta[i-1])) + ((accx(v[i-1],theta[i-1])) * dt));
+		        vy = ((v[i-1] * Math.sin(theta[i-1])) + ((accy(v[i-1],theta[i-1])) * dt));
 		        v[i] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		        theta[i] = Math.atan(vy/vx);
 		
-		        x[i] = (2*(x[i-1])) - (x[i-2]) + (accx*(dt*dt));
-		        y[i] = (y[i-1]) + (vy*dt);
+		        x[i] = (x[i-1] + (vx * dt));
+			    y[i] = (y[i-1] + (vy * dt));
 			
 			    xf = x[i];
-		    }
-		
+			}
+	            
+		    /** Before restarting the loop again, the new value of xf is compared to the current value of xMax. If the value
+		        of xf is greater than xMax, xMax is changed to the value of xf and thetaMax is changed to the current value
+			of theta[0] which is the intial angle. If xf is less than xMax, nothing changes
+	            */
+			
 		    if (xf > xMax)
 		    {
 			    xMax = xf;
@@ -158,24 +167,18 @@ public class GolfBall
 		    }
 	    }	
 		
+		/** After finding the value of thetaMax, we need to reassign the values of the array since they are still equal to the 
+		    last iteration of the loop. The sequence will still be exactly the same as before with Euler to start off and a for
+		    loop with Verlet
+		*/
+		
 		v[0] = 70.0;
 		theta[0] = thetaMax;
 		x[0] = 0.0;
 		y[0] = 0.0;
-		Cd = 7.0/v[0];
 		
-        adrag[0] = ((Cd * rho * area * (v[0]*v[0]))/mass);
-		adragx = (adrag[0] * Math.cos(theta[0]));
-		adragy = (adrag[0] * Math.sin(theta[0]));
-		  
-		amagnusx[0] = (So * (v[0] * Math.sin(theta[0])));
-		amagnusy[0] = (So * (v[0] * Math.cos(theta[0])));
-		  
-		accx = (((-1) * (adragx)) - (amagnusx[0]));
-		accy = (((-1) * (adragy)) + (amagnusy[0]) - g);
-		
-		vx = ((v[0] * Math.cos(theta[0])) + (accx * dt));
-		vy = ((v[0] * Math.sin(theta[0])) + (accy * dt));
+       		vx = ((v[0] * Math.cos(theta[0])) + ((accx(v[0],theta[0])) * dt));
+		vy = ((v[0] * Math.sin(theta[0])) + ((accy(v[0],theta[0])) * dt));
 		v[1] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		theta[1] = Math.atan(vy/vx);
 		
@@ -184,92 +187,50 @@ public class GolfBall
 		
 		for (int i=2; y[i-1] > 0.0; i++)
 		{
-			if(v[i-1] < 14.0)
-			{
-				Cd = 0.5;
-			}
-			
-			else
-			{
-				Cd = 7.0/v[i-1];
-			}
-			
-			adrag[i-1] = ((Cd * rho * area * (v[i-1]*v[i-1]))/mass);
-			adragx = (adrag[i-1] * Math.cos(theta[i-1]));
-		    adragy = (adrag[i-1] * Math.sin(theta[i-1]));
-			
-			amagnusx[i-1] = (So * (v[i-1] * Math.sin(theta[i-1])));
-		    amagnusy[i-1] = (So * (v[i-1] * Math.cos(theta[i-1])));
-			
-			accx = (((-1) * (adragx)) - (amagnusx[i-1]));
-		    accy = (((-1) * (adragy)) + (amagnusy[i-1]) - g);
-			
-			vx = ((v[i-1] * Math.cos(theta[i-1])) + (accx * dt));
-		    vy = ((v[i-1] * Math.sin(theta[i-1])) + (accy * dt));
+			vx = ((v[i-1] * Math.cos(theta[i-1])) + ((accx(v[i-1],theta[i-1])) * dt));
+		    vy = ((v[i-1] * Math.sin(theta[i-1])) + ((accy(v[i-1],theta[i-1])) * dt));
 		    v[i] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		    theta[i] = Math.atan(vy/vx);
 		
-		    x[i] = (2*(x[i-1])) - (x[i-2]) + (accx*(dt*dt));
-			y[i] = (2*(y[i-1])) - (y[i-2]) + (accy*(dt*dt));
+		    x[i] = (2*(x[i-1])) - (x[i-2]) + ((accx(v[i-1],theta[i-1])) * (dt*dt));
+			y[i] = (2*(y[i-1])) - (y[i-2]) + ((accy(v[i-1],theta[i-1])) * (dt*dt));
+			xMax = x[i];	
 	    }
 		
-	/*	double[] x45 = new double[imax];
-		double[] y45 = new double[imax];
-		
-		v[0] = 70.0;
-		theta[0] = 0.785398;
+	/** This section of the code was supposed to create new arrays for the values of the position of the golf ball with an intial	
+	    angle of 45 degrees. That way there are two sets of arrays. One for optimum angle and max distance and the other set for
+	    an intial angle of 45 degrees. And it will follow the exact same sequence as well
+	*/
+
+        	v[0] = 70.0;
+		theta[0] = 0.785398; // 45 degrees
 		x45[0] = 0.0;
 		y45[0] = 0.0;
-		Cd = 7.0/v[0];
 		
-        adrag[0] = ((Cd * rho * area * (v[0]*v[0]))/mass);
-		adragx = (adrag[0] * Math.cos(theta[0]));
-		adragy = (adrag[0] * Math.sin(theta[0]));
-		  
-		amagnusx[0] = (So * (v[0] * Math.sin(theta[0])));
-		amagnusy[0] = (So * (v[0] * Math.cos(theta[0])));
-		  
-		accx = (((-1) * (adragx)) - (amagnusx[0]));
-		accy = (((-1) * (adragy)) + (amagnusy[0]) - g);
-		
-		vx = ((v[0] * Math.cos(theta[0])) + (accx * dt));
-		vy = ((v[0] * Math.sin(theta[0])) + (accy * dt));
+	    	vx = ((v[0] * Math.cos(theta[0])) + ((accx(v[0],theta[0])) * dt));
+		vy = ((v[0] * Math.sin(theta[0])) + ((accy(v[0],theta[0])) * dt));
 		v[1] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		theta[1] = Math.atan(vy/vx);
 		
 		x45[1] = (x[0] + (vx * dt));
 		y45[1] = (y[0] + (vy * dt));
+		double xMax45 = x45[1];
 		
-		for (int i=2; y[i-1] > 0.0; i++)
+		for (int i=2; y45[i-1] > 0.0; i++)
 		{
-			if(v[i-1] < 14.0)
-			{
-				Cd = 0.5;
-			}
-			
-			else
-			{
-				Cd = 7.0/v[i-1];
-			}
-			
-			adrag[i-1] = ((Cd * rho * area * (v[i-1]*v[i-1]))/mass);
-			adragx = (adrag[i-1] * Math.cos(theta[i-1]));
-		    adragy = (adrag[i-1] * Math.sin(theta[i-1]));
-			
-			amagnusx[i-1] = (So * (v[i-1] * Math.sin(theta[i-1])));
-		    amagnusy[i-1] = (So * (v[i-1] * Math.cos(theta[i-1])));
-			
-			accx = (((-1) * (adragx)) - (amagnusx[i-1]));
-		    accy = (((-1) * (adragy)) + (amagnusy[i-1]) - g);
-			
-			vx = ((v[i-1] * Math.cos(theta[i-1])) + (accx * dt));
-		    vy = ((v[i-1] * Math.sin(theta[i-1])) + (accy * dt));
+		    vx = ((v[i-1] * Math.cos(theta[i-1])) + ((accx(v[i-1],theta[i-1])) * dt));
+		    vy = ((v[i-1] * Math.sin(theta[i-1])) + ((accy(v[i-1],theta[i-1])) * dt));
 		    v[i] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		    theta[i] = Math.atan(vy/vx);
 		
-		    x45[i] = (2*(x[i-1])) - (x[i-2]) + (accx*(dt*dt));
-			y45[i] = (2*(y[i-1])) - (y[i-2]) + (accy*(dt*dt));
-	    }*/
+		   	x45[i] = ((x45[i-1]) + (vx * dt));
+			y45[i] = ((y45[i-1]) + (vy * dt));
+			xMax45 = x45[i];
+	    }
+	    
+	    /** And this section is all about graphing which is pretty much just copy paste so I don't think I have much to say here.
+	        Hopefully these comments helped in some way
+            */
 		
 	    ////////////////////////////////////////////////////////////////
 		//1. Opening a file to store the x vs y data
@@ -280,7 +241,7 @@ public class GolfBall
 		PrintWriter outputFile = null;
   	  	try
   	  	{
-  	  	  outputFile = new PrintWriter(new FileOutputStream("angle_vs_time.txt",false));
+  	  	  outputFile = new PrintWriter(new FileOutputStream("x_vs_y.txt",false));
   	  	}
   	  	catch(FileNotFoundException e)
   	  	{
@@ -305,17 +266,23 @@ public class GolfBall
 		//////////////////////////////////////////////////////////////////////////////
 		// 4. Find and then print period as a function of amplitude
 		//////////////////////////////////////////////////////////////////////////////
-		System.out.println("x	y");
+		System.out.println("x	        y");
 		System.out.println("(m)		(m)");
 		System.out.println(xMax + "  0 ");
+		System.out.println(xMax45 + " 0 ");
 		
 		///////////////////////////////////////////////////////////////////////
 		// 5. Closing file
 		///////////////////////////////////////////////////////////////////////
 		outputFile.close();
+	
+	   	System.out.printf("The angle in degrees to launch the golf ball at for maximum distance is %.3f\n",Math.toDegrees(thetaMax));
+	   	System.out.printf("The maximum distance travelled by the ball in meters is %.3f\n",xMax);	
+		System.out.printf("The maximum distance travelled by the ball in meters when the angle is 45 degrees is %.3f\n",xMax45);
 		
-}		
-    ///////////////////////////////////////////////////////////////////////
+    }		
+    
+	///////////////////////////////////////////////////////////////////////
   	// 7. Live graphing of angular postion as a function of time for amplitude = printamplitude
   	///////////////////////////////////////////////////////////////////////
   	public static void plot(double theta, double[] x, double[] y)
@@ -330,22 +297,16 @@ public class GolfBall
     	plot1.setAxisLabel(0,"x (m)");
     	plot1.setAxisLabel(1,"y (m)");
     	BaseLabel title1 = new BaseLabel("x v.s. y for max angle "
-    	  + theta + " degrees", Color.BLACK, 0.5, 1.1);
+    	  + Math.toDegrees(theta) + " degrees", Color.BLACK, 0.5, 1.1);
 
     	title1.setFont(new Font("Courier", Font.BOLD, 14));
     	plot1.addPlotable(title1);
 
     	// put the PlotPanel in a JFrame like a JPanel
     	JFrame frame1 = new JFrame("a plot panel");
-    	frame1.setSize(1200, 1200);
+    	frame1.setSize(500, 500);
     	frame1.setContentPane(plot1);
     	frame1.setVisible(true);
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-  	}//plot
-		
-		
-		/*System.out.printf("The angle in degrees to launch the golf ball at for maximum distance is %.3f\n",thetaMax);
-		System.out.printf("The maximum distance travelled by the ball in meters is %.3f\n",xMax);*/
+  	}
 }
-		
-		
