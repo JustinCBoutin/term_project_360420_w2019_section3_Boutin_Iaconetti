@@ -6,6 +6,7 @@ import org.math.plot.*;
 import org.math.plot.plotObjects.*;
 import java.util.Arrays;
 
+//Useless comment
 public class GolfBall
 {
 	public static final boolean plotxVsy = true; // Only store and plot the angle vs time graph when set to true
