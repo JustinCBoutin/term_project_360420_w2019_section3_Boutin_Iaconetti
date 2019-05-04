@@ -12,9 +12,9 @@ import org.math.plot.*;
 import org.math.plot.plotObjects.*;
 import java.util.Arrays;
 
-public class GolfBall2
+public class GolfBall
 {
-	public static final boolean plotxVsy = false; // Only store and plot the angle vs time graph when set to true
+	public static final boolean plotxVsy = true; // Only store and plot the angle vs time graph when set to true
 
     public static double accx (double v, double theta)
 	{
@@ -172,8 +172,8 @@ public class GolfBall2
 			
 			xFinal[ctr] = xf ;
 			thetaG[ctr] = Math.toDegrees(theta[0]);
-			System.out.println(xFinal[ctr]);
-			System.out.println(thetaG[ctr]);
+			//System.out.println(xFinal[ctr]);
+			//System.out.println(thetaG[ctr]);
 			
 			/** Before restarting the angle loop again, the new value of xf is compared to the current value of xMax. If the value
 		        of xf is greater than xMax, xMax is changed to the value of xf and thetaMax is changed to the current value
@@ -284,6 +284,8 @@ public class GolfBall2
 			}
 
 	   		plot(thetaMax, x, y); //Method below
+			plot(0.7853981634, x45, y45);
+			plot2(thetaG, xFinal);
 		}
 		
 		//////////////////////////////////////////////////////////////////////////////
@@ -308,7 +310,7 @@ public class GolfBall2
 	///////////////////////////////////////////////////////////////////////
   	// 7. Live graphing of angular postion as a function of time for amplitude = printamplitude
   	///////////////////////////////////////////////////////////////////////
-  	public static void plot(double theta, double[] x, double[] y)
+  	public static void plot(double angle, double[] x, double[] y)
   	{
   	  	Plot2DPanel plot1 = new Plot2DPanel();
 
@@ -320,16 +322,39 @@ public class GolfBall2
     	plot1.setAxisLabel(0,"x (m)");
     	plot1.setAxisLabel(1,"y (m)");
     	BaseLabel title1 = new BaseLabel("x v.s. y for max angle "
-    	  + Math.toDegrees(theta) + " degrees", Color.BLACK, 0.5, 1.1);
+    	  + Math.toDegrees(angle) + " degrees", Color.BLACK, 0.5, 1.1);
 
     	title1.setFont(new Font("Courier", Font.BOLD, 14));
     	plot1.addPlotable(title1);
 
     	// put the PlotPanel in a JFrame like a JPanel
-    	JFrame frame1 = new JFrame("a plot panel");
-    	frame1.setSize(500, 500);
+    	JFrame frame1 = new JFrame("Ball Trajectory");
+    	frame1.setSize(800, 800);
     	frame1.setContentPane(plot1);
     	frame1.setVisible(true);
 		frame1.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  	}
+	  	public static void plot2(double[] x, double[] y)
+  	{
+  	  	Plot2DPanel plot2 = new Plot2DPanel();
+
+    	// define the legend position
+    	plot2.addLegend("SOUTH");
+
+    	// add a line plot to the PlotPanel
+    	plot2.addLinePlot("GolfBall", x, y);
+    	plot2.setAxisLabel(0,"Angle(rad)");
+    	plot2.setAxisLabel(1,"x distance(m)");
+    	BaseLabel title2 = new BaseLabel("Angle v.s. Max Distance ", Color.BLACK, 0.5, 1.1);
+
+    	title2.setFont(new Font("Courier", Font.BOLD, 14));
+    	plot2.addPlotable(title2);
+
+    	// put the PlotPanel in a JFrame like a JPanel
+    	JFrame frame2 = new JFrame("Angle vs Max Distance");
+    	frame2.setSize(800, 800);
+    	frame2.setContentPane(plot2);
+    	frame2.setVisible(true);
+		frame2.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
   	}
 }
