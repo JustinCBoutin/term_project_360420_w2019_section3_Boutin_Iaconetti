@@ -24,11 +24,6 @@ public class GolfBall
 	    double area = 0.00143;  // m^2, radius = 21.335mm
         double rho = 1.168;     // kg/m^3
 		
-		if (v > 14.0)
-		{
-			Cd = 7.0/v;
-		}
-		
         double aDrag = ((Cd * rho * area * (v*v))/mass);        // Formula for the acceleration due to drag Cd*p*area*V^2
 		double aDragx = (aDrag * Math.cos(theta));              // x-component of the acceleration due to drag 
 		
@@ -55,11 +50,6 @@ public class GolfBall
 	    double area = 0.001432;
         double rho = 1.168;     
 	    double g = 9.81;        // accelerartion due to gravity, m/s^2
-		
-		if (v > 14.0)
-		{
-			Cd = 7.0/v;
-		}
 		
 		double aDrag = ((Cd * rho * area * (v*v))/mass);
 		double aDragy = (aDrag * Math.sin(theta)); // y-component of the accelerartion due to drag
