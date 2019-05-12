@@ -81,7 +81,7 @@ public class GolfBall
 		double[] thetaG = new double[900];            //array for the initial angle of the ball to display on graph later, 900 vales since loop stops when angle is PI/2
 		double[] xFinal = new double[900];            //array for final position of ball in x-position to display on graph later
 		
-		v[0] =70.0;           // initial speed of the ball  
+		v[0] =10.0;           // initial speed of the ball  
 		theta[0] = 0.00174533; // initial angle of the ball = 0.1 degrees
 		x[0] = 0.0;            // initial x-position of the ball
 		y[0] = 0.0;            // initial y-position of the ball
