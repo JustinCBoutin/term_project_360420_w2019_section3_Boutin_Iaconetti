@@ -22,9 +22,9 @@ public class GolfBall
 	    double So = 0.22;       // (Magnus coefficient x omega)/mass 
         double mass = 0.04593;  // kg
 	    double area = 0.00143;  // m^2, radius = 21.335mm
-        double rho = 1.168;     // kg/m^3
+        double airDen = 1.184;     // density of air kg/m^3
 		
-        double aDrag = ((Cd * rho * area * (v*v))/mass);        // Formula for the acceleration due to drag Cd*p*area*V^2
+        double aDrag = ((Cd * airDen * area * (v*v))/mass);        // Formula for the acceleration due to drag Cd*p*area*V^2
 		double aDragx = (aDrag * Math.cos(theta));              // x-component of the acceleration due to drag 
 		
 		/**The Magnus force is given by the cross product of the angular velocity and linear velocity. 
@@ -48,10 +48,10 @@ public class GolfBall
 	    double So = 0.217;        
         double mass = 0.0459;   
 	    double area = 0.001432;
-        double rho = 1.168;     
+        double airDen = 1.168;     
 	    double g = 9.81;        // accelerartion due to gravity, m/s^2
 		
-		double aDrag = ((Cd * rho * area * (v*v))/mass);
+		double aDrag = ((Cd * airDen * area * (v*v))/mass);
 		double aDragy = (aDrag * Math.sin(theta)); // y-component of the accelerartion due to drag
 		
 		// After applying cross product formula the equation for Magnus in y-direction is given by My = So(wz * Vx)
