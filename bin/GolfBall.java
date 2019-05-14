@@ -81,7 +81,10 @@ public class GolfBall
 		double[] thetaG = new double[900];            //array for the initial angle of the ball to display on graph later, 900 vales since loop stops when angle is PI/2
 		double[] xFinal = new double[900];            //array for final position of ball in x-position to display on graph later
 		
-		v[0] =10.0;           // initial speed of the ball  
+		double[] xOpt = new double[imax];
+		double[] yOpt = new double[imax];
+		
+		v[0] =70.0;           // initial speed of the ball  
 		theta[0] = 0.00174533; // initial angle of the ball = 0.1 degrees
 		x[0] = 0.0;            // initial x-position of the ball
 		y[0] = 0.0;            // initial y-position of the ball
@@ -187,27 +190,27 @@ public class GolfBall
 		
 		v[0] = 70.0;
 		theta[0] = thetaMax;
-		x[0] = 0.0;
-		y[0] = 0.0;
+		xOpt[0] = 0.0;
+		yOpt[0] = 0.0;
 		
         vx = ((v[0] * Math.cos(theta[0])) + ((accx(v[0],theta[0])) * dt));
 		vy = ((v[0] * Math.sin(theta[0])) + ((accy(v[0],theta[0])) * dt));
 		v[1] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		theta[1] = Math.atan(vy/vx);
 		
-		x[1] = (x[0] + (vx * dt));
-		y[1] = (y[0] + (vy * dt));
+		xOpt[1] = (x[0] + (vx * dt));
+		yOpt[1] = (y[0] + (vy * dt));
 		
-		for (int i=2; y[i-1] > 0.0; i++)
+		for (int i=2; yOpt[i-1] > 0.0; i++)
 		{
 			vx = ((v[i-1] * Math.cos(theta[i-1])) + ((accx(v[i-1],theta[i-1])) * dt));
 		    vy = ((v[i-1] * Math.sin(theta[i-1])) + ((accy(v[i-1],theta[i-1])) * dt));
 		    v[i] = Math.sqrt((Math.pow(vx,2.0)) + (Math.pow(vy,2.0)));
 		    theta[i] = Math.atan(vy/vx);
 		
-		    x[i] = (2*(x[i-1])) - (x[i-2]) + ((accx(v[i-1],theta[i-1])) * (dt*dt));
-			y[i] = (2*(y[i-1])) - (y[i-2]) + ((accy(v[i-1],theta[i-1])) * (dt*dt));
-			xMax = x[i];	
+		    xOpt[i] = (2*(xOpt[i-1])) - (xOpt[i-2]) + ((accx(v[i-1],theta[i-1])) * (dt*dt));
+			yOpt[i] = (2*(yOpt[i-1])) - (yOpt[i-2]) + ((accy(v[i-1],theta[i-1])) * (dt*dt));
+			xMax = xOpt[i];	
 	    }
 		
 	/** This section of the code was supposed to create new arrays for the values of the position of the golf ball with an intial	
@@ -273,7 +276,7 @@ public class GolfBall
 				outputFile.println(x[i] + "	" + y[i]);
 			}
 
-	   		plot(thetaMax, x, y); //Method below
+	   		plot(thetaMax, xOpt, yOpt); //Method below
 			plot(0.7853981634, x45, y45);
 			plot2(thetaG, xFinal);
 		}
