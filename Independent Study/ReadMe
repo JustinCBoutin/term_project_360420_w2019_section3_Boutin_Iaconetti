@@ -1,6 +1,7 @@
-The GolfBall3.java code inputs dimples into the code
-The GolfBall2.java code now includes the z-direction, breaking apart the code into components
-The GolfBall4.java code is the final result with dimples, z-direction and works to optimize spin for a desired distance
-To run any of the codes and get any of the graphs, first check if the boolean expression at the start of the code is true
-Open the command prompt and run javac GolfBall[2,3,4].java
-Wait for it to compile and then run java GolfBall[2,3,4]
+
+-The GolfBall3.java code inputs dimples into the code
+-The GolfBall2.java code now includes the z-direction, breaking apart the code into components
+-The GolfBall4.java code is the final result with dimples, z-direction and works to optimize spin for a desired distance
+-To run any of the codes and get any of the graphs, first check if the boolean expression at the start of the code is true
+-Open the command prompt and run javac GolfBall[2,3,4].java
+-Wait for it to compile and then run java GolfBall[2,3,4]
