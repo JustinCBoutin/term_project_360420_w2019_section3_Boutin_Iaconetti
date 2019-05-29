@@ -26,7 +26,7 @@ public class GolfBall3
 		
 		if (v > 14.0)
 		{
-			Cd = 7.0/v;
+			Cd = 7.0/v; // Change in drag coefficient due to dimples on golf ball
 		}
 		
         double aDrag = ((Cd * rho * area * (v*v))/mass);        // Formula for the acceleration due to drag Cd*p*area*V^2

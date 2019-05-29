@@ -19,7 +19,7 @@ public class GolfBall2
     public static double accx (double vx, double vy, double v)
 	{
 		double Cd = 0.5;        // Drag Coefficient for non-dimpled Golf Ball
-	    double So = 0.00006;       // Magnus coefficient
+	    double So = 0.00006;    // Magnus coefficient
         double mass = 0.04593;  // kg
 	    double area = 0.00143;  // m^2, radius = 21.335mm
         double rho = 1.184;     // kg/m^3
@@ -28,7 +28,7 @@ public class GolfBall2
 		
 		if (v > 14.0)
 		{
-			Cd = 7.0/v;
+			Cd = 7.0/v; // Change in drag coeffciient due to dimples on golf ball
 		}
 		
 		double aDragx = ((0.5 * Cd * rho * area * (vx*vx))/mass);  // Formula for the acceleration due to drag in x-direction
@@ -38,7 +38,7 @@ public class GolfBall2
 		   Using the formula for cross product, the Magnus force in the x-direction is given by Mx = (So/m)(-omegaZ*Vy)
 		*/
 	
-	    double aMagnusx = ((So/mass) * (omegaZ * vy)); // x-component of the acceleration due to Magnus (So*Vy)
+	    double aMagnusx = ((So/mass) * (omegaZ * vy)); 
 	
 	    /** The differntial equation we are solving for tells us that the x-component of the acceleration of the ball 
 		    is equal to the sum of the x components of the acceleration due to Drag and Magnus. Both of which are in negative direction
@@ -66,9 +66,9 @@ public class GolfBall2
 		
 		double aDragy = ((0.5 * Cd * rho * area * (vy*vy))/mass); // Formula for the acceleration due to drag in y-direction 
 		
-		// After applying cross product formula the equation for Magnus in y-direction is given by My = (So/m) * (omegaZ * Vx)
+		// After applying cross product formula the equation for Magnus in y-direction is given by My = (So/m) * (omegaZ * Vx) - (omegaX * Vz)
 		
-		double aMagnusy = ((So/mass) * ((omegaZ * vx) - (omegaX * vz))); // y-component of the acceleration due to Magnus (So*Vx)
+		double aMagnusy = ((So/mass) * ((omegaZ * vx) - (omegaX * vz))); 
 	    
 		/** The y-component of the acceleration of the ball is equal to the sum of the y-components of the acceleration 
 		    due to Magnus and Drag, minus the acceleration due to gravity g.
@@ -97,7 +97,7 @@ public class GolfBall2
 		
 		// After applying cross product formula the equation for Magnus in z-direction is given by Mz = (So/m) * (omegaX * Vy)
 		
-		double aMagnusz = ((So/mass) * (omegaX * vy)); // y-component of the acceleration due to Magnus (So*Vx)
+		double aMagnusz = ((So/mass) * (omegaX * vy)); 
 	    
 		/** The y-component of the acceleration of the ball is equal to the sum of the z-components of the acceleration 
 		    due to Magnus and Drag
@@ -213,7 +213,7 @@ public class GolfBall2
 		        x[i] = ((2*x[i-1]) - (x[i-2]) + ((accx(vx[i-1],vy[i-1],v[i-1])) * (dt*dt)));
 			    y[i] = (y[i-1] + (vy[i] * dt)); // Verlet's won't work here
 			    z[i] = (z[i-1] + (vz[i] * dt));
-				System.out.println(x[i] + "\t" + z[i]);
+				//System.out.println(x[i] + "\t" + z[i]);
 			    xf = x[i];
 			}
 	       

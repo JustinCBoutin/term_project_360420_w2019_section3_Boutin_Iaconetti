@@ -9,23 +9,23 @@ import java.util.Arrays;
 public class GolfBall4
 {
 	public static final boolean plotzVsx = true; // Only store and plot the angle vs time graph when set to true
-	public static double Cd = 0.5;
-	public static double So = 0.00006;
-	public static final double mass = 0.04593;
-	public static final double radius = 0.021335;
-	public static final double area = 0.00143;
-	public static final double rho = 1.184;
-	public static final double g = 9.81;
-	public static final double dt = 1.0e-3;   
-    public static final double tMax = 20.0;    
-    public static double wx = 1.0;
-    public static double wz = 1.0;	
+	public static double Cd = 0.5;                // Drag Coefficient
+	public static double So = 0.00006;            // Magnus Coefficient
+	public static final double mass = 0.04593;    // mass in kg
+	public static final double radius = 0.021335; // radius of golf ball in meters
+	public static final double area = 0.00143;    // area of golf ball in m^2
+	public static final double rho = 1.184;       // density of air in kg/m^3
+	public static final double g = 9.81;          // accelerartion due to gravity in m/s^2
+	public static final double dt = 1.0e-3;       // time step in seconds
+    public static final double tMax = 20.0;       // total amount of time
+    public static double wx = 1.0;                // initial guess for optimum angular speed in x-direction
+    public static double wz = 1.0;	              // initial guess for optimum angular speed in z-direction
 	
 	public static double accx (double vx, double vy, double v, double omegaZ)
 	{
 		if (v > 14.0)
 		{
-			Cd = 7.0/v;
+			Cd = 7.0/v; // Change in drag coefficient due to dimples on golf ball
 		}
 		
 		double aDragx = ((0.5 * Cd * rho * area * (vx*vx))/mass);  // Formula for the acceleration due to drag in x-direction
@@ -35,7 +35,7 @@ public class GolfBall4
 		   Using the formula for cross product, the Magnus force in the x-direction is given by Mx = (So/m)(-omegaZ*Vy)
 		*/
 	
-	    double aMagnusx = ((So/mass) * (omegaZ * vy)); // x-component of the acceleration due to Magnus (So*Vy)
+	    double aMagnusx = ((So/mass) * (omegaZ * vy)); 
 	
 	    /** The differntial equation we are solving for tells us that the x-component of the acceleration of the ball 
 		    is equal to the sum of the x components of the acceleration due to Drag and Magnus. Both of which are in negative direction
@@ -54,9 +54,9 @@ public class GolfBall4
 		
 		double aDragy = ((0.5 * Cd * rho * area * (vy*vy))/mass); // Formula for the acceleration due to drag in y-direction 
 		
-		// After applying cross product formula the equation for Magnus in y-direction is given by My = (So/m) * (omegaZ * Vx)
+		// After applying cross product formula the equation for Magnus in y-direction is given by My = (So/m) * (omegaZ * Vx) - (omegaX * Vz)
 		
-		double aMagnusy = ((So/mass) * ((omegaZ * vx) - (omegaX * vz))); // y-component of the acceleration due to Magnus (So*Vx)
+		double aMagnusy = ((So/mass) * ((omegaZ * vx) - (omegaX * vz))); 
 	    
 		/** The y-component of the acceleration of the ball is equal to the sum of the y-components of the acceleration 
 		    due to Magnus and Drag, minus the acceleration due to gravity g.
@@ -77,7 +77,7 @@ public class GolfBall4
 		
 		// After applying cross product formula the equation for Magnus in z-direction is given by Mz = (So/m) * (omegaX * Vy)
 		
-		double aMagnusz = ((So/mass) * (omegaX * vy)); // y-component of the acceleration due to Magnus (So*Vx)
+		double aMagnusz = ((So/mass) * (omegaX * vy)); 
 	    
 		/** The y-component of the acceleration of the ball is equal to the sum of the z-components of the acceleration 
 		    due to Magnus and Drag
@@ -100,13 +100,14 @@ public class GolfBall4
 		double[] xOpt = new double[imax];			  //array for x-position of golf ball with optimum angle
 		double[] yOpt = new double[imax];             //array for y-position of golf ball with optimum angle
 		double[] zOpt = new double[imax];			  //array for z-position of golf ball with optimum angle
-		double theta = 0.00174533; 
-		double omegaX = 1.0;
-		double omegaZ = 1.0;
-		double xf = 0.0;
-		double zf = 0.0;
-		double xMax = 300.0;
-		double zMax = 50.0;
+		
+		double theta = 0.00174533;                    // initial angle of first golf shot
+		double omegaX = 1.0;                          // initial angular speed in x-direction which will change over time
+		double omegaZ = 1.0;                          // initial angular speed in z-direction which will change over time
+		double xf = 0.0;                              // variable to hold final position of ball at the end of each loop in x-direction     
+		double zf = 0.0;                              // variable to hold final position of ball at the end of each loop in z-direction
+		double xMax = 300.0;                          // desired final position in x-direction which can be changed
+		double zMax = 50.0;                           // desired final position in z-direction which can be changed
 		
 		v[0] = 70.0;                     // initial speed of ball
 		vx[0] = v[0] * Math.cos(theta);  // initial speed of x-component
@@ -143,7 +144,12 @@ public class GolfBall4
 			zf = z[i];
 		}
 		
-		theta = 0.00349066;
+		theta = 0.00349066; // initial angle incremented by 0.1 degrees 
+		
+		/** This next loop will increase the angular speed in the z-direction as the accelerartion in the x-direction is dependent 
+		    on that componenet due to the magnus coefficient. The angular speed in the x-direction will be kept constant at the 
+			initial guess of wx.
+		**/
 		
 		while (xf < xMax)
 		{ 
@@ -181,10 +187,15 @@ public class GolfBall4
 				zf = z[i];
 			}
 	
-			theta += 0.00174533;
-            omegaZ++;		
+			theta += 0.00174533; // increase angle until desired final position in x is achieved
+            omegaZ++;		     // increase omegaZ until desired position is reached
 	    }
 	
+	    /** Now that there is a guess for the optimum omegaZ, the next loop will work to find the optimum omegaX. The omegaZ found will be used during
+		    the loop, but is still subject to change as there is still a relation between omegaX and omegaZ. The omegaX will be incremented at the end
+			of the loop each time, while the omegaZ must satisfy certain factors to be changed
+		**/
+	 
 		while (zf < zMax)
 		{
 			vx[0] = v[0] * Math.cos(theta); 
@@ -221,12 +232,14 @@ public class GolfBall4
 				zf = z[i];
 			}
 			
+			// if the final x-position is greater than the desired final position, then the omegaZ is decreased and the angle is increased
 			if (xf > xMax)
 			{
 				omegaZ--;
 				theta+=0.0017453;
 			}
 			
+			// if the final x-position is less than the desired final position, then the omegaZ is increased and the angle is increased
 			if (xf < xMax)
 			{
 				omegaZ++;
@@ -235,6 +248,8 @@ public class GolfBall4
 			
 			omegaX++;
 		}
+		
+		// This last section fills the Optimum arrays to plot all the desired graphs at the end of the code, using the optimum spin in both directions
 		
 		xOpt[0] = 0.0;
 		yOpt[0] = 0.0;
